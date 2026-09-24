@@ -5,8 +5,6 @@
 ![Language](https://img.shields.io/badge/lang-zh--CN-red)
 ![Deploy](https://img.shields.io/badge/deploy-Gitee_Pages-orange)
 
-个人技术博客，主题覆盖机器学习、深度学习、云原生、Kubernetes。
-
 站点地址：https://pozicaiman.gitee.io
 
 ## 快速开始
