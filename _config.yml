@@ -110,6 +110,6 @@ search:
 deploy:
   type: git
   repo: https://github.com/pozicaiman/pozicaiman.github.io.git
-  branch: gh-pages
+  branch: master
   ignore_hidden: false
   message: "Site updated: {{ now('YYYY-MM-DD HH:mm:ss') }}"
