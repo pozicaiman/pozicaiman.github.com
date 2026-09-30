@@ -6,3 +6,11 @@ node_modules/
 .idea/
 .deploy*/
 _multiconfig.yml
+
+# Generated output
+docs/
+
+# Temp files
+_*.js
+_*.txt
+_*.json
