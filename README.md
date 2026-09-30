@@ -13,7 +13,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://gitee.com/pozicaiman/pozicaiman.git
+git clone https://github.com/pozicaiman/pozicaiman.github.com.git
 cd pozicaiman
 
 # 安装依赖

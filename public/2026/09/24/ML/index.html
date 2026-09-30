@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>机器学习全景：从经典算法到工程实践 | CaiJianfeng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="机器学习,Scikit-learn,数据科学">
+    <meta name="description" content="本文是《深度学习全景》的姊妹篇。DL 篇回答”如何用神经网络做端到端学习”；本篇回答”机器学习到底在做什么、经典算法如何工作、如何完成一个可靠的 ML 项目”。两者各成体系，可独立阅读。  第 1 章 机器学习全景导论1.1 什么是机器学习机器学习（Machine Learning, ML）是让计算机从数据中自动归纳规律，并用规律对新数据做预测或决策的学科。它不用人显式编写规则，而是用算法自己去">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习全景：从经典算法到工程实践">
+<meta property="og:url" content="https://pozicaiman.github.io/2026/09/24/ML/index.html">
+<meta property="og:site_name" content="CaiJianfeng">
+<meta property="og:description" content="本文是《深度学习全景》的姊妹篇。DL 篇回答”如何用神经网络做端到端学习”；本篇回答”机器学习到底在做什么、经典算法如何工作、如何完成一个可靠的 ML 项目”。两者各成体系，可独立阅读。  第 1 章 机器学习全景导论1.1 什么是机器学习机器学习（Machine Learning, ML）是让计算机从数据中自动归纳规律，并用规律对新数据做预测或决策的学科。它不用人显式编写规则，而是用算法自己去">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-24T06:17:20.000Z">
+<meta property="article:modified_time" content="2026-09-24T06:48:27.355Z">
+<meta property="article:author" content="CaiJianfeng">
+<meta property="article:tag" content="Scikit-learn">
+<meta property="article:tag" content="数据科学">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">CaiJianfeng</h5>
+          <a href="mailto:cai.jianfeng91@gmail.com" title="cai.jianfeng91@gmail.com" class="mail">cai.jianfeng91@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/pozicaiman" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">机器学习全景：从经典算法到工程实践</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare" data-title="复制链接">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">机器学习全景：从经典算法到工程实践</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-09-24T06:17:20.000Z" itemprop="datePublished" class="page-time">
+  2026-09-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC-1-%E7%AB%A0-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%99%AF%E5%AF%BC%E8%AE%BA"><span class="post-toc-number">1.</span> <span class="post-toc-text">第 1 章 机器学习全景导论</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AF%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1.1 什么是机器学习</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-2-%E4%B8%89%E5%A4%A7%E8%8C%83%E5%BC%8F"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">1.2 三大范式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-3-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">1.3 机器学习 &#x2F; 深度学习 &#x2F; 统计学的关系</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-4-%E7%BB%9F%E4%B8%80%E8%A7%86%E8%A7%92%EF%BC%9A%E7%BB%8F%E9%AA%8C%E9%A3%8E%E9%99%A9%E6%9C%80%E5%B0%8F%E5%8C%96%EF%BC%88ERM%EF%BC%89"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">1.4 统一视角：经验风险最小化（ERM）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-5-%E5%BA%94%E7%94%A8%E5%9C%B0%E5%9B%BE%E4%B8%8E%E6%9C%AC%E6%96%87%E8%B7%AF%E7%BA%BF"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">1.5 应用地图与本文路线</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-ML"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">机器学习全景：从经典算法到工程实践</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-09-24 14:17:20" datetime="2026-09-24T06:17:20.000Z"  itemprop="datePublished">2026-09-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本文是《深度学习全景》的姊妹篇。DL 篇回答”如何用神经网络做端到端学习”；本篇回答”机器学习到底在做什么、经典算法如何工作、如何完成一个可靠的 ML 项目”。两者各成体系，可独立阅读。</p>
+</blockquote>
+<h1 id="第-1-章-机器学习全景导论"><a href="#第-1-章-机器学习全景导论" class="headerlink" title="第 1 章 机器学习全景导论"></a>第 1 章 机器学习全景导论</h1><h2 id="1-1-什么是机器学习"><a href="#1-1-什么是机器学习" class="headerlink" title="1.1 什么是机器学习"></a>1.1 什么是机器学习</h2><p>机器学习（Machine Learning, ML）是让计算机<strong>从数据中自动归纳规律</strong>，并用规律对新数据做预测或决策的学科。它不用人显式编写规则，而是用算法自己去”学”。</p>
+<p>形式上，几乎所有机器学习问题都可以写成一句话：</p>
+<blockquote>
+<p><strong>从样本集 $\{(x^{(i)}, y^{(i)})\}_{i=1}^{N}$ 中学习一个函数 $f: \mathcal{X} \to \mathcal{Y}$，使得它在新数据上的预测误差最小。</strong></p>
+</blockquote>
+<p>$x$ 是特征（如年龄、收入、点击次数），$y$ 是标签（如”是否购买”）。<code>机器学习 = 假设空间 + 损失函数 + 优化算法</code>——选择什么函数族（假设空间）、用什么度量误差（损失）、怎么搜索最优函数（优化），三者定了，一个 ML 问题就完全定义了。</p>
+<h2 id="1-2-三大范式"><a href="#1-2-三大范式" class="headerlink" title="1.2 三大范式"></a>1.2 三大范式</h2><table>
+<thead>
+<tr>
+<th>范式</th>
+<th>数据形态</th>
+<th>目标</th>
+<th>典型任务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>监督学习</td>
+<td>有特征 + 有标签</td>
+<td>学到 $x \to y$ 的映射</td>
+<td>分类、回归</td>
+</tr>
+<tr>
+<td>无监督学习</td>
+<td>只有特征</td>
+<td>发现数据内部结构</td>
+<td>聚类、降维、异常检测</td>
+</tr>
+<tr>
+<td>强化学习</td>
+<td>状态&#x2F;动作&#x2F;奖励</td>
+<td>学习策略使累计奖励最大</td>
+<td>博弈、机器人控制</td>
+</tr>
+</tbody></table>
+<p>考虑到篇幅，本文主要覆盖<strong>监督与无监督</strong>。强化学习（策略梯度、Q-Learning）与深度学习结合更紧密，可另行成篇。</p>
+<h2 id="1-3-机器学习-深度学习-统计学的关系"><a href="#1-3-机器学习-深度学习-统计学的关系" class="headerlink" title="1.3 机器学习 &#x2F; 深度学习 &#x2F; 统计学的关系"></a>1.3 机器学习 &#x2F; 深度学习 &#x2F; 统计学的关系</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">       统计学</span><br><span class="line">     /        \</span><br><span class="line">经典机器学习   深度学习（神经网络的子集）</span><br><span class="line">（本篇文章）    （DL.md 那篇）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>统计</strong>提供理论框架：估计、假设检验、偏差-方差。</li>
+<li><strong>经典 ML</strong> 是”可解释 + 数据高效”的实用主义阵营：线性模型、树、SVM、KNN。</li>
+<li><strong>深度学习</strong> 用多层非线性网络自动学特征，擅长图像&#x2F;语音&#x2F;文本，但需要大数据与算力。</li>
+</ul>
+<p>关键分工（经典 ML 的不可替代处）：</p>
+<ol>
+<li><strong>表格数据（报表、交易、用户画像）</strong>：树集成模型（XGBoost&#x2F;LightGBM&#x2F;RandomForest）至今仍是基准最强。</li>
+<li><strong>数据量小</strong>：几千行样本时，经典算法比神经网络更稳。</li>
+<li><strong>可解释性要求高</strong>：风控、医疗、审计需要 SHAP、特征重要性，而非黑箱神经网络。</li>
+<li><strong>延迟敏感</strong>：毫秒级推理，核对了 CPU 就够。</li>
+</ol>
+<blockquote>
+<p>2026 年的边界正在松动：表格基础模型（如 TabPFN）用海量合成数据预训练后可以”免训练”预测；LLM 驱动的 AutoML（如 LACE）能自动写出完整 pipeline。但这些系统的”终局模型”往往仍是 XGBoost&#x2F;CatBoost——经典算法反而因此获得新生命力，详见第 7 章。</p>
+</blockquote>
+<h2 id="1-4-统一视角：经验风险最小化（ERM）"><a href="#1-4-统一视角：经验风险最小化（ERM）" class="headerlink" title="1.4 统一视角：经验风险最小化（ERM）"></a>1.4 统一视角：经验风险最小化（ERM）</h2><p>几乎全部监督学习都可以纳入同一框架。设损失函数 $L(\hat{y}, y)$ 度量预测与真相的差距，我们希望最小化<strong>期望风险</strong>（对未来所有数据的平均损失）：</p>
+<p>$$
+R(f) = \mathbb{E}_{(x, y) \sim P}\big[ L(f(x), y) \big]
+$$</p>
+<p>但 $P$（真实数据分布）未知，只能近似为训练集上的<strong>经验风险</strong>：</p>
+<p>$$
+R_{emp}(f) = \frac{1}{N} \sum_{i=1}^{N} L\big( f(x^{(i)}), y^{(i)} \big)
+$$</p>
+<p>于是学习问题变成：</p>
+<p>$$
+\boxed{\; f^* = \arg\min_{f \in \mathcal{H}} R_{emp}(f) \;}
+$$</p>
+<p>不同算法只是”假设空间 $\mathcal{H}$ + 损失 $L$ + 优化器”的不同实例化：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>假设空间</th>
+<th>损失</th>
+<th>优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线性回归</td>
+<td>线性函数</td>
+<td>均方误差 $\frac12\|y - Xw\|^2$</td>
+<td>解析解 &#x2F; 梯度下降</td>
+</tr>
+<tr>
+<td>逻辑回归</td>
+<td>线性函数 + sigmoid</td>
+<td>交叉熵</td>
+<td>梯度下降</td>
+</tr>
+<tr>
+<td>SVM</td>
+<td>线性&#x2F;核函数</td>
+<td>合页损失 + 正则</td>
+<td>对偶&#x2F;坐标上升</td>
+</tr>
+<tr>
+<td>决策树</td>
+<td>分段常数函数</td>
+<td>基尼&#x2F;信息增益</td>
+<td>贪心递归分裂</td>
+</tr>
+<tr>
+<td>KNN</td>
+<td>无显式参数</td>
+<td>距离度量</td>
+<td>无训练（懒惰学习）</td>
+</tr>
+</tbody></table>
+<h2 id="1-5-应用地图与本文路线"><a href="#1-5-应用地图与本文路线" class="headerlink" title="1.5 应用地图与本文路线"></a>1.5 应用地图与本文路线</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">第 2 章 数据、特征、标签（一切的基础）</span><br><span class="line">第 3 章 评估与选择（用什么标准说&quot;模型好&quot;）</span><br><span class="line">第 4 章 监督模型族（分类 + 回归的工作马）</span><br><span class="line">第 5 章 无监督：聚类 + 降维（结构发现）</span><br><span class="line">第 6 章 特征工程（决定性能上限的 80%）</span><br><span class="line">第 7 章 Scikit-learn 端到端实战 + 2026 前沿</span><br></pre></td></tr></table></figure>
+
+<p>读完你应该能：<strong>看懂任意经典算法的公式</strong>、<strong>用 Scikit-learn 独立跑通一个项目</strong>、<strong>在表格数据上做出比默认调参更可靠的模型</strong>。</p>
+<hr>
+<p>[第 2 章 数据、特征与标签：待写]</p>
+<p>[第 3 章 模型评估与选择：待写]</p>
+<p>[第 4 章 经典模型族：待写]</p>
+<p>[第 5 章 聚类与降维：待写]</p>
+<p>[第 6 章 特征工程与数据预处理：待写]</p>
+<p>[第 7 章 Scikit-learn 实战与 2026 前沿：待写]</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-24T06:48:27.355Z" itemprop="dateUpdated">2026-09-24 14:48:27</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2026/09/24/ML/" target="_blank" rel="external">https://pozicaiman.github.io/2026/09/24/ML/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://pozicaiman.github.io">
+            <img src="/img/avatar.jpg" alt="CaiJianfeng">
+            CaiJianfeng
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scikit-learn/" rel="tag">Scikit-learn</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%A7%91%E5%AD%A6/" rel="tag">数据科学</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle" data-title="复制链接">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2026/09/24/Cloud-Native/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Cloud-Native</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2026/09/24/DL/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">深度学习全景：从基础到前沿</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>CaiJianfeng &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+    <script src="/vendor/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- MathJax 3 (local, no CDN) config similar to math.stackexchange -->
+<script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+    },
+    svg: {
+        fontCache: 'global'
+    },
+    options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+};
+</script>
+<script defer src="/vendor/mathjax/tex-svg.js"></script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

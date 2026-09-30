@@ -17,6 +17,8 @@
     <title>CaiJianfeng</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
+    <meta name="theme-color" content="#3F51B5">
+    
     
     <meta name="keywords" content="">
     <meta property="og:type" content="website">
@@ -27,7 +29,7 @@
 <meta property="article:author" content="CaiJianfeng">
 <meta name="twitter:card" content="summary">
     
-    <link rel="shortcut icon" href="/">
+    <link rel="shortcut icon" href="/favicon.ico">
     <link rel="stylesheet" href="/css/style.css?v=1.7.2">
     <script>window.lazyScripts=[]</script>
 
@@ -44,19 +46,54 @@
     <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
         <i class="icon icon-lg icon-close"></i>
     </a>
-    <div class="brand-wrap" style="background-image:url(/)">
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
       <div class="brand">
         <a href="/" class="avatar waves-effect waves-circle waves-light">
-          <img src="/">
+          <img src="/img/avatar.jpg">
         </a>
         <hgroup class="introduce">
           <h5 class="nickname">CaiJianfeng</h5>
-          <a href="mailto:undefined" class="mail">
+          <a href="mailto:cai.jianfeng91@gmail.com" title="cai.jianfeng91@gmail.com" class="mail">cai.jianfeng91@gmail.com</a>
         </hgroup>
       </div>
     </div>
     <div class="scroll-wrap flex-col">
       <ul class="nav">
+        
+            <li class="waves-block waves-effect active">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/pozicaiman" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
         
       </ul>
     </div>
@@ -71,6 +108,20 @@
         </a>
         <div class="flex-col header-title ellipsis">CaiJianfeng</div>
         
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare" data-title="复制链接">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
         
     </div>
 </header>
@@ -123,7 +174,7 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        1. 云原生定义2. 云原生架构3. 云原生技术栈4....
+        1. 云原生定义2. 云原生架构3. 云原生技术栈4. 云原生应用5. 云原生最佳实践6. 云原生案例7. 云原生未来
     
 
         <a href="/2026/09/24/Cloud-Native/" class="post-more waves-effect waves-button">
@@ -171,7 +222,9 @@
 
     
         
-本文是《深度学习全景》的姊妹篇。DL 篇回答”如何用...
+本文是《深度学习全景》的姊妹篇。DL 篇回答”如何用神经网络做端到端学习”；本篇回答”机器学习到底在做什么、经典算法如何工作、如何完成一个可靠的 ML 项目”。两者各成体系，可独立阅读。
+
+第 1 章 机器学习全景导论1.1 什么是机器学习机器学习（Machine Learning, ML）是让计算机从数据中自动归纳规律，并用规律对新数据做预测或决策的学科。它不用人显式编写规则，而是用算法...
     
 
         <a href="/2026/09/24/ML/" class="post-more waves-effect waves-button">
@@ -219,7 +272,11 @@
 
     
         1. 引言：从机器学习到深度学习[待写]
-2. 神经网...
+2. 神经网络基础[待写]
+3. 训练机制：梯度下降与反向传播这是深度学习最核心的一章：一个网络能「学会」东西，靠的就是梯度下降 + 反向传播这套机制。本节从直觉出发，给出完整的数学推导。
+3.1 训练的本质：把「学习」变成优化问题一个神经网络的参数是所有权重 $W^l$ 和偏置 $b^l$。训练就是寻找一组参数，让损失函数 $L$ 最小：
+$$
+\...
     
 
         <a href="/2026/09/24/DL/" class="post-more waves-effect waves-button">
@@ -246,6 +303,15 @@
         <footer class="footer">
     <div class="top">
         
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
 
         <p>
             
@@ -253,7 +319,7 @@
         </p>
     </div>
     <div class="bottom">
-        <p><span>CaiJianfeng &copy; 2026</span>
+        <p><span>CaiJianfeng &copy; 2015 - 2026</span>
             <span>
                 
                 Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
@@ -268,7 +334,7 @@
 
     <script src="/vendor/waves.min.js"></script>
 <script>
-var BLOG = { ROOT: '/', SHARE: , REWARD: false };
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
 
 
 </script>
@@ -276,10 +342,67 @@ var BLOG = { ROOT: '/', SHARE: , REWARD: false };
 <script src="/js/main.min.js?v=1.7.2"></script>
 
 
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
 
 
 
+<!-- MathJax 3 (local, no CDN) config similar to math.stackexchange -->
+<script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+    },
+    svg: {
+        fontCache: 'global'
+    },
+    options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+};
+</script>
+<script defer src="/vendor/mathjax/tex-svg.js"></script>
 
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
 
 
 
