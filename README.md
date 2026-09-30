@@ -5,7 +5,7 @@
 ![Language](https://img.shields.io/badge/lang-zh--CN-red)
 ![Deploy](https://img.shields.io/badge/deploy-Gitee_Pages-orange)
 
-站点地址：https://pozicaiman.gitee.io
+站点地址：https://pozicaiman.github.io
 
 ## 快速开始
 
