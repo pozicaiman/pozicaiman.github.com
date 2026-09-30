@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>深度学习全景：从基础到前沿 | CaiJianfeng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="机器学习,深度学习,PyTorch">
+    <meta name="description" content="1. 引言：从机器学习到深度学习[待写] 2. 神经网络基础[待写] 3. 训练机制：梯度下降与反向传播这是深度学习最核心的一章：一个网络能「学会」东西，靠的就是梯度下降 + 反向传播这套机制。本节从直觉出发，给出完整的数学推导。 3.1 训练的本质：把「学习」变成优化问题一个神经网络的参数是所有权重 $W^l$ 和偏置 $b^l$。训练就是寻找一组参数，让损失函数 $L$ 最小： $$ \min">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度学习全景：从基础到前沿">
+<meta property="og:url" content="https://pozicaiman.github.io/2026/09/24/DL/index.html">
+<meta property="og:site_name" content="CaiJianfeng">
+<meta property="og:description" content="1. 引言：从机器学习到深度学习[待写] 2. 神经网络基础[待写] 3. 训练机制：梯度下降与反向传播这是深度学习最核心的一章：一个网络能「学会」东西，靠的就是梯度下降 + 反向传播这套机制。本节从直觉出发，给出完整的数学推导。 3.1 训练的本质：把「学习」变成优化问题一个神经网络的参数是所有权重 $W^l$ 和偏置 $b^l$。训练就是寻找一组参数，让损失函数 $L$ 最小： $$ \min">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-24T04:01:30.000Z">
+<meta property="article:modified_time" content="2026-09-24T06:48:27.354Z">
+<meta property="article:author" content="CaiJianfeng">
+<meta property="article:tag" content="PyTorch">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">CaiJianfeng</h5>
+          <a href="mailto:cai.jianfeng91@gmail.com" title="cai.jianfeng91@gmail.com" class="mail">cai.jianfeng91@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/pozicaiman" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">深度学习全景：从基础到前沿</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare" data-title="复制链接">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">深度学习全景：从基础到前沿</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-09-24T04:01:30.000Z" itemprop="datePublished" class="page-time">
+  2026-09-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-%E5%BC%95%E8%A8%80%EF%BC%9A%E4%BB%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%88%B0%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 引言：从机器学习到深度学习</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 神经网络基础</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-%E8%AE%AD%E7%BB%83%E6%9C%BA%E5%88%B6%EF%BC%9A%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%B8%8E%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 训练机制：梯度下降与反向传播</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-1-%E8%AE%AD%E7%BB%83%E7%9A%84%E6%9C%AC%E8%B4%A8%EF%BC%9A%E6%8A%8A%E3%80%8C%E5%AD%A6%E4%B9%A0%E3%80%8D%E5%8F%98%E6%88%90%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 训练的本质：把「学习」变成优化问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-2-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%EF%BC%9A%E4%B8%8B%E5%B1%B1%E7%9A%84%E7%9B%B4%E8%A7%89"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 梯度下降：下山的直觉</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-3-%E9%93%BE%E5%BC%8F%E6%B3%95%E5%88%99%EF%BC%9A%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9C%B0%E5%9F%BA"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3.3 链式法则：反向传播的数学地基</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-4-%E7%AC%A6%E5%8F%B7%E4%BD%93%E7%B3%BB%E4%B8%8E%E8%AE%A1%E7%AE%97%E5%9B%BE"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">3.4 符号体系与计算图</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-5-%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%EF%BC%9A%E4%B8%80%E9%95%9C%E5%88%B0%E5%BA%95"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">3.5 前向传播：一镜到底</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-6-%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">3.6 反向传播的核心思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-7-%E8%BE%93%E5%87%BA%E5%B1%82%E6%8E%A8%E5%AF%BC%EF%BC%9Asoftmax-%E4%BA%A4%E5%8F%89%E7%86%B5"><span class="post-toc-number">3.7.</span> <span class="post-toc-text">3.7 输出层推导：softmax + 交叉熵</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-8-%E9%9A%90%E8%97%8F%E5%B1%82%E6%8E%A8%E5%AF%BC%EF%BC%9A%E8%AF%AF%E5%B7%AE%E5%A6%82%E4%BD%95%E5%8F%8D%E5%90%91%E6%B5%81%E5%8A%A8"><span class="post-toc-number">3.8.</span> <span class="post-toc-text">3.8 隐藏层推导：误差如何反向流动</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-9-%E6%9D%83%E9%87%8D%E4%B8%8E%E5%81%8F%E7%BD%AE%E7%9A%84%E6%A2%AF%E5%BA%A6"><span class="post-toc-number">3.9.</span> <span class="post-toc-text">3.9 权重与偏置的梯度</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-10-%E5%90%91%E9%87%8F%E5%8C%96%E8%A7%86%E8%A7%92%EF%BC%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E4%B8%80%E4%B8%80%E5%AF%B9%E5%BA%94"><span class="post-toc-number">3.10.</span> <span class="post-toc-text">3.10 向量化视角：和代码一一对应</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-11-%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E4%B8%8E%E7%88%86%E7%82%B8%EF%BC%9A%E6%B7%B1%E5%B1%82%E7%BD%91%E7%BB%9C%E7%9A%84%E9%98%BF%E5%96%80%E7%90%89%E6%96%AF%E4%B9%8B%E8%B8%B5"><span class="post-toc-number">3.11.</span> <span class="post-toc-text">3.11 梯度消失与爆炸：深层网络的阿喀琉斯之踵</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-12-%E4%BC%98%E5%8C%96%E5%99%A8%E5%AF%B9%E6%AF%94%EF%BC%9ASGD-Momentum-Adam"><span class="post-toc-number">3.12.</span> <span class="post-toc-text">3.12 优化器对比：SGD &#x2F; Momentum &#x2F; Adam</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-13-%E5%B0%8F%E7%BB%93"><span class="post-toc-number">3.13.</span> <span class="post-toc-text">3.13 小结</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-%E5%AE%9E%E6%88%98%EF%BC%9AMNIST-%E4%BB%8E%E9%9B%B6%E8%AE%AD%E7%BB%83%EF%BC%88PyTorch%EF%BC%89"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. 实战：MNIST 从零训练（PyTorch）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B%EF%BC%9ACNN-%E2%86%92-RNN-%E2%86%92-Transformer"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 架构演进：CNN → RNN → Transformer</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-2026-%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%EF%BC%9ALLM%E3%80%81%E5%A4%9A%E6%A8%A1%E6%80%81%E4%B8%8E%E5%89%8D%E6%B2%BF%E6%9E%B6%E6%9E%84"><span class="post-toc-number">6.</span> <span class="post-toc-text">6. 2026 最新进展：LLM、多模态与前沿架构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#7-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%EF%BC%9A%E8%AF%BB%E8%AE%BA%E6%96%87-%E4%B8%8A%E6%89%8B%E8%AE%AD%E7%BB%83"><span class="post-toc-number">7.</span> <span class="post-toc-text">7. 学习路线：读论文 &amp; 上手训练</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-DL"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">深度学习全景：从基础到前沿</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-09-24 12:01:30" datetime="2026-09-24T04:01:30.000Z"  itemprop="datePublished">2026-09-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="1-引言：从机器学习到深度学习"><a href="#1-引言：从机器学习到深度学习" class="headerlink" title="1. 引言：从机器学习到深度学习"></a>1. 引言：从机器学习到深度学习</h2><p>[待写]</p>
+<h2 id="2-神经网络基础"><a href="#2-神经网络基础" class="headerlink" title="2. 神经网络基础"></a>2. 神经网络基础</h2><p>[待写]</p>
+<h2 id="3-训练机制：梯度下降与反向传播"><a href="#3-训练机制：梯度下降与反向传播" class="headerlink" title="3. 训练机制：梯度下降与反向传播"></a>3. 训练机制：梯度下降与反向传播</h2><p>这是深度学习最核心的一章：一个网络能「学会」东西，靠的就是<strong>梯度下降 + 反向传播</strong>这套机制。本节从直觉出发，给出完整的数学推导。</p>
+<h3 id="3-1-训练的本质：把「学习」变成优化问题"><a href="#3-1-训练的本质：把「学习」变成优化问题" class="headerlink" title="3.1 训练的本质：把「学习」变成优化问题"></a>3.1 训练的本质：把「学习」变成优化问题</h3><p>一个神经网络的参数是所有权重 $W^l$ 和偏置 $b^l$。训练就是寻找一组参数，让损失函数 $L$ 最小：</p>
+<p>$$
+\min_{W,b} \; L(W, b)
+$$</p>
+<p>为什么不能直接解析求解？因为参数动辄百万、千万级，$L$ 又是参数的高度非线性函数，没有闭式解。所以我们采用<strong>迭代逼近</strong>的方式：从某个初始参数出发，反复朝着「让 $L$ 变小」的方向移动。</p>
+<h3 id="3-2-梯度下降：下山的直觉"><a href="#3-2-梯度下降：下山的直觉" class="headerlink" title="3.2 梯度下降：下山的直觉"></a>3.2 梯度下降：下山的直觉</h3><p>想象你在浓雾中的山上，想走到最低谷。你只能靠脚底的感觉判断哪个方向是下坡——而<strong>梯度</strong>正是函数上升最快的方向，负梯度就是下降最快的方向。于是每一步都朝负梯度方向迈步，这就是梯度下降：</p>
+<p>$$
+W \leftarrow W - \eta \frac{\partial L}{\partial W}, \qquad b \leftarrow b - \eta \frac{\partial L}{\partial b}
+$$</p>
+<p>其中 $\eta$ 是<strong>学习率</strong>：</p>
+<ul>
+<li>$\eta$ 太小 → 收敛极慢，甚至卡住</li>
+<li>$\eta$ 太大 → 越过谷底来回震荡，甚至发散</li>
+</ul>
+<p>梯度下降的名字很多——全量梯度下降（GD）、随机梯度下降（SGD）、小批量梯度下降（mini-batch GD），区别只在每次用多少样本估计梯度，我们会在 3.12 节展开。</p>
+<h3 id="3-3-链式法则：反向传播的数学地基"><a href="#3-3-链式法则：反向传播的数学地基" class="headerlink" title="3.3 链式法则：反向传播的数学地基"></a>3.3 链式法则：反向传播的数学地基</h3><p>回到微积分最基础的<strong>链式法则</strong>：若 $y = f(u)$ 且 $u = g(x)$，则</p>
+<p>$$
+\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}
+$$</p>
+<p>复合函数层层嵌套，导数就一层层相乘。神经网络正是一个超大型复合函数，反向传播不过是在这个复合函数上系统地应用链式法则。</p>
+<h3 id="3-4-符号体系与计算图"><a href="#3-4-符号体系与计算图" class="headerlink" title="3.4 符号体系与计算图"></a>3.4 符号体系与计算图</h3><p>先约定记号（此后全文沿用）：</p>
+<ul>
+<li>第 $l$ 层的权重矩阵 $W^l$，偏置向量 $b^l$</li>
+<li>线性输出 $z^l = W^l a^{l-1} + b^l$</li>
+<li>激活输出 $a^l = \sigma(z^l)$（$\sigma$ 为激活函数）</li>
+<li>$L$ 为总层数，第 $L$ 层为输出层</li>
+<li>核心定义：第 $l$ 层的<strong>误差</strong> $\delta^l = \dfrac{\partial L}{\partial z^l}$</li>
+</ul>
+<p><strong>计算图</strong>记录了前向传播中所有中间量及其依赖关系。以单隐藏层网络（2 输入 → 2 隐元 → 1 输出）为例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x ──► z¹ = W¹x + b¹ ──► a¹ = σ(z¹) ──► z² = W²a¹ + b² ──► a² = σ(z²) ──► L = ℓ(a², y)</span><br><span class="line">       ▲                      ▲                     ▲                     ▲</span><br><span class="line">      W¹, b¹                 σ                      W², b²                ℓ</span><br></pre></td></tr></table></figure>
+
+<p>前向传播沿箭头向右：计算每层的 $z^l, a^l$，最终得到损失 $L$。反向传播则沿箭头向左：把 $L$ 对参数的梯度逐层回传。</p>
+<h3 id="3-5-前向传播：一镜到底"><a href="#3-5-前向传播：一镜到底" class="headerlink" title="3.5 前向传播：一镜到底"></a>3.5 前向传播：一镜到底</h3><p>对每一层 $l = 1, \dots, L$ 依次计算：</p>
+<p>$$
+z^l = W^l a^{l-1} + b^l, \qquad a^l = \sigma(z^l)
+$$</p>
+<p>其中 $a^0 = x$（输入）。最终损失 $L = \ell(a^L, y)$ 度量预测与真实标签的差距。</p>
+<p>透过计算图可以直接读出一个关键事实：<strong>$L$ 对任何一层参数的依赖，都要穿过其后所有层</strong>。这正是「误差逐层传导」的来源。</p>
+<h3 id="3-6-反向传播的核心思想"><a href="#3-6-反向传播的核心思想" class="headerlink" title="3.6 反向传播的核心思想"></a>3.6 反向传播的核心思想</h3><p>我们要的是 $\dfrac{\partial L}{\partial W^l}$ 和 $\dfrac{\partial L}{\partial b^l}$。直接对每层暴力展开链式法则会指数爆炸；反向传播的聪明之处在于<strong>复用</strong>：先算出输出层的误差 $\delta^L$，然后递归地算出前一层误差 $\delta^{L-1}, \delta^{L-2}, \dots$，最后每层的参数梯度只需一次简单乘法。</p>
+<p>具体分三步：</p>
+<ol>
+<li><strong>输出层误差</strong> $\delta^L$</li>
+<li><strong>误差回传</strong>：$\delta^l \to \delta^{l-1}$</li>
+<li><strong>参数梯度</strong>：由 $\delta^l$ 得到 $\dfrac{\partial L}{\partial W^l}, \dfrac{\partial L}{\partial b^l}$</li>
+</ol>
+<p>下面逐一推导。</p>
+<h3 id="3-7-输出层推导：softmax-交叉熵"><a href="#3-7-输出层推导：softmax-交叉熵" class="headerlink" title="3.7 输出层推导：softmax + 交叉熵"></a>3.7 输出层推导：softmax + 交叉熵</h3><p>以分类任务为例，输出层先过 <strong>softmax</strong> 把 logits 变成概率分布：</p>
+<p>$$
+a_j^L = \frac{e^{z_j^L}}{\sum_k e^{z_k^L}}
+$$</p>
+<p>损失用<strong>交叉熵</strong>：</p>
+<p>$$
+L = -\sum_j y_j \log a_j^L
+$$</p>
+<p>其中 $y_j$ 是 one-hot 标签。现在推导输出层误差 $\delta_j^L = \dfrac{\partial L}{\partial z_j^L}$。由链式法则：</p>
+<p>$$
+\delta_j^L = \sum_k \frac{\partial L}{\partial a_k^L} \cdot \frac{\partial a_k^L}{\partial z_j^L}
+$$</p>
+<p>交叉熵部分很简单：$\dfrac{\partial L}{\partial a_k^L} = -\dfrac{y_k}{a_k^L}$。softmax 的偏导要分两种情况（这是本节唯一的计算”重活”）：</p>
+<p>$$
+\frac{\partial a_k^L}{\partial z_j^L} =
+\begin{cases}
+a_j^L (1 - a_j^L), & k = j \\
+-a_k^L a_j^L, & k \ne j
+\end{cases}
+$$</p>
+<p>代入整理（把 $k=j$ 与 $k\ne j$ 两项分开合并）：</p>
+<p>$$
+\delta_j^L = -\frac{y_j}{a_j^L} a_j^L(1-a_j^L) + \sum_{k \ne j} \frac{y_k}{a_k^L} a_k^L a_j^L
+= -y_j(1-a_j^L) + \sum_{k \ne j} y_k \, a_j^L
+$$</p>
+<p>$$
+= -y_j + a_j^L \sum_k y_k = a_j^L - y_j
+$$</p>
+<p>（最后一步用到 $\sum_k y_k = 1$。）于是得到<strong>输出层误差的极简形式</strong>：</p>
+<p>$$
+\delta^L = a^L - y
+$$</p>
+<p>这个漂亮的结果只在 softmax + 交叉熵这个组合下成立——这正是实践中几乎总用这对组合的原因之一。</p>
+<h3 id="3-8-隐藏层推导：误差如何反向流动"><a href="#3-8-隐藏层推导：误差如何反向流动" class="headerlink" title="3.8 隐藏层推导：误差如何反向流动"></a>3.8 隐藏层推导：误差如何反向流动</h3><p>现在推导 $\delta^l \to \delta^{l-1}$ 的递推式。$L$ 对前一层的依赖经过 $z_j^l = \sum_k W_{jk}^l a_k^{l-1} + b_j^l$，即 $z^l = W^l a^{l-1} + b^l$。对第 $l-1$ 层的误差：</p>
+<p>$$
+\delta_j^{l-1} = \frac{\partial L}{\partial z_j^{l-1}} = \sum_k \frac{\partial L}{\partial z_k^l}
+\cdot \frac{\partial z_k^l}{\partial z_j^{l-1}}
+$$</p>
+<p>其中第一项就是 $\delta_k^l$；第二项再次用链式法则：</p>
+<p>$$
+\frac{\partial z_k^l}{\partial z_j^{l-1}} = W_{kj}^l \, \sigma'(z_j^{l-1})
+$$</p>
+<p>于是：</p>
+<p>$$
+\delta_j^{l-1} = \sigma'(z_j^{l-1}) \sum_k W_{kj}^l \delta_k^l
+$$</p>
+<p>写成向量形式，就是反向传播招牌式的<strong>误差回传公式</strong>：</p>
+<p>$$
+\boxed{\;\delta^{l} = (W^{l+1})^T \delta^{l+1} \odot \sigma'(z^{l})\;}
+$$</p>
+<p>其中 $\odot$ 是逐元素（Hadamard）乘积。几何理解：误差从后层沿转置权重 $(W^{l+1})^T$「分摊」回来，再被激活函数导数 $\sigma'(z^l)$ 这个闸门缩放——闸门接近 0，梯度就传不过去，这正是 3.11 节梯度消失的根源。</p>
+<h3 id="3-9-权重与偏置的梯度"><a href="#3-9-权重与偏置的梯度" class="headerlink" title="3.9 权重与偏置的梯度"></a>3.9 权重与偏置的梯度</h3><p>最后一步。已知 $\delta^l = \dfrac{\partial L}{\partial z^l}$，而 $z^l = W^l a^{l-1} + b^l$，对参数直接求偏导：</p>
+<p>$$
+\frac{\partial L}{\partial W^l} = \delta^l (a^{l-1})^T, \qquad
+\frac{\partial L}{\partial b^l} = \delta^l
+$$</p>
+<p>推导只需一步链式法则：$\dfrac{\partial L}{\partial W_{jk}^l} = \delta_j^l \, a_k^{l-1}$，合成矩阵即上式。</p>
+<p><strong>全套反向传播算法</strong>（BP）：</p>
+<ol>
+<li>前向传播：算出 $z^1, a^1, \dots, z^L, a^L, L$</li>
+<li>输出层误差：$\delta^L = a^L - y$</li>
+<li>逐层回传：$\delta^l = (W^{l+1})^T \delta^{l+1} \odot \sigma'(z^l)$，$l = L-1, \dots, 1$</li>
+<li>参数更新：$W^l \leftarrow W^l - \eta \delta^l (a^{l-1})^T$，$b^l \leftarrow b^l - \eta \delta^l$</li>
+</ol>
+<p>这套流程对任意层数都成立——上面从单隐藏层推广到任意 $L$ 层，记号里唯一的「深度」体现在第 3 步的循环。</p>
+<h3 id="3-10-向量化视角：和代码一一对应"><a href="#3-10-向量化视角：和代码一一对应" class="headerlink" title="3.10 向量化视角：和代码一一对应"></a>3.10 向量化视角：和代码一一对应</h3><p>实际框架（PyTorch 等）不会手写逐层循环，而是借助自动微分。但理解向量化能让你看懂框架在做什么：</p>
+<ul>
+<li>每个 $\delta^l$ 是形状为「(本层神经元数, batch 大小)」的矩阵</li>
+<li>参数梯度 $\delta^l (a^{l-1})^T$ 是外积，一次算出一整层所有权重梯度</li>
+<li>梯度从输出层「流」向输入层时，数据形状逐层变化，但运算模式完全相同</li>
+</ul>
+<p>正是这种规整的矩阵运算，让 GPU 能并行加速——反向传播慢不慢，几乎完全取决于你能否把计算写成矩阵操作。</p>
+<h3 id="3-11-梯度消失与爆炸：深层网络的阿喀琉斯之踵"><a href="#3-11-梯度消失与爆炸：深层网络的阿喀琉斯之踵" class="headerlink" title="3.11 梯度消失与爆炸：深层网络的阿喀琉斯之踵"></a>3.11 梯度消失与爆炸：深层网络的阿喀琉斯之踵</h3><p>回传公式里有个隐患：$\delta^l$ 的传播要反复乘以 $\sigma'(z)$。若激活函数是 sigmoid&#x2F;tanh，其导数最大只有 0.25，多层连乘后梯度指数级衰减——浅层几乎学不到东西，这就是<strong>梯度消失</strong>；反过来若权重初始化过大，梯度又会爆炸。两者都会让深层网络难以训练。</p>
+<p><strong>常用对策</strong>（后文章节会逐个展开）：</p>
+<ul>
+<li>激活函数换成 <strong>ReLU</strong>（正区间导数为 1，缓解消失）</li>
+<li>合理的<strong>权重初始化</strong>（如 He &#x2F; Xavier）</li>
+<li>批归一化（BatchNorm）</li>
+<li>残差连接（ResNet 的核心思想）</li>
+<li>更稳健的优化器 + 学习率调度</li>
+</ul>
+<h3 id="3-12-优化器对比：SGD-Momentum-Adam"><a href="#3-12-优化器对比：SGD-Momentum-Adam" class="headerlink" title="3.12 优化器对比：SGD &#x2F; Momentum &#x2F; Adam"></a>3.12 优化器对比：SGD &#x2F; Momentum &#x2F; Adam</h3><p>梯度下降只告诉方向，怎么走是个工程问题。下面是三种主流优化器。</p>
+<p><strong>SGD</strong>（最朴素）：直接用当前样本的小批量梯度。</p>
+<p>$$
+g = \frac{1}{m}\sum_i \nabla L_i, \qquad W \leftarrow W - \eta g
+$$</p>
+<p>优点：简单、泛化性好；缺点：方向噪声大、在峡谷地形来回震荡（如上图 zig-zag）。</p>
+<p><strong>Momentum</strong>：引入「动量」，让更新方向积累历史梯度，像下山时带惯性。</p>
+<p>$$
+v \leftarrow \beta v + g, \qquad W \leftarrow W - \eta v
+$$</p>
+<p>震荡被平滑，能更快冲出平坦区。$\beta$ 常取 0.9。</p>
+<p><strong>Adam</strong>（Adaptive Moment Estimation）：进一步为每个参数维护梯度的一阶矩 $m$ 与二阶矩 $v$，做偏差修正后自适应调整每维学习率。</p>
+<p>$$
+m \leftarrow \beta_1 m + (1-\beta_1) g, \quad
+v \leftarrow \beta_2 v + (1-\beta_2) g^2
+$$</p>
+<p>$$
+\hat{m} = \frac{m}{1-\beta_1^t}, \quad \hat{v} = \frac{v}{1-\beta_2^t}, \quad
+W \leftarrow W - \eta \frac{\hat{m}}{\sqrt{\hat{v}} + \epsilon}
+$$</p>
+<p><strong>工程建议</strong>：多数现代任务直接用 Adam（$\beta_1=0.9, \beta_2=0.999, \epsilon=10^{-8}$）能快速收敛到不错的结果；若要追求极致泛化性能，可在后期切换或对比 SGD + Momentum，配合学习率调度（warmup → cosine decay）效果更佳。<strong>优化器不改变损失面，只改变到达低点的路径</strong>——这一章推导的损失函数与梯度才是根本。</p>
+<h3 id="3-13-小结"><a href="#3-13-小结" class="headerlink" title="3.13 小结"></a>3.13 小结</h3><ul>
+<li>训练 &#x3D; 对损失函数做迭代优化，梯度下降是最基本手段</li>
+<li>反向传播 &#x3D; 用链式法则高效计算所有参数梯度：$\delta^L = a^L - y$，随后 $\delta^l = (W^{l+1})^T \delta^{l+1} \odot \sigma'(z^l)$</li>
+<li>参数梯度只需 $\delta^l$ 与激活输出的一步乘法</li>
+<li>深度带来梯度消失&#x2F;爆炸风险，激活函数、初始化、归一化、残差连接是对策</li>
+<li>优化器解决「怎么走」，SGD 简单稳健，Adam 快速省心</li>
+</ul>
+<p>下一章，我们把这一章的知识真正用起来——用 PyTorch 从零训练一个手写数字识别模型。</p>
+<h2 id="4-实战：MNIST-从零训练（PyTorch）"><a href="#4-实战：MNIST-从零训练（PyTorch）" class="headerlink" title="4. 实战：MNIST 从零训练（PyTorch）"></a>4. 实战：MNIST 从零训练（PyTorch）</h2><p>[待写]</p>
+<h2 id="5-架构演进：CNN-→-RNN-→-Transformer"><a href="#5-架构演进：CNN-→-RNN-→-Transformer" class="headerlink" title="5. 架构演进：CNN → RNN → Transformer"></a>5. 架构演进：CNN → RNN → Transformer</h2><p>[待写]</p>
+<h2 id="6-2026-最新进展：LLM、多模态与前沿架构"><a href="#6-2026-最新进展：LLM、多模态与前沿架构" class="headerlink" title="6. 2026 最新进展：LLM、多模态与前沿架构"></a>6. 2026 最新进展：LLM、多模态与前沿架构</h2><p>[待写]</p>
+<h2 id="7-学习路线：读论文-上手训练"><a href="#7-学习路线：读论文-上手训练" class="headerlink" title="7. 学习路线：读论文 &amp; 上手训练"></a>7. 学习路线：读论文 &amp; 上手训练</h2><p>[待写]</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-24T06:48:27.354Z" itemprop="dateUpdated">2026-09-24 14:48:27</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2026/09/24/DL/" target="_blank" rel="external">https://pozicaiman.github.io/2026/09/24/DL/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://pozicaiman.github.io">
+            <img src="/img/avatar.jpg" alt="CaiJianfeng">
+            CaiJianfeng
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PyTorch/" rel="tag">PyTorch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle" data-title="复制链接">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2026/09/24/ML/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">机器学习全景：从经典算法到工程实践</h4>
+      </a>
+    </div>
+  
+
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>CaiJianfeng &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+    <script src="/vendor/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- MathJax 3 (local, no CDN) config similar to math.stackexchange -->
+<script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+    },
+    svg: {
+        fontCache: 'global'
+    },
+    options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+};
+</script>
+<script defer src="/vendor/mathjax/tex-svg.js"></script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
