@@ -109,7 +109,7 @@ search:
 ## 源码留在 master 分支，静态产物推到 gh-pages 分支供 GitHub Pages 服务消费
 deploy:
   type: git
-  repo: https://github.com/pozicaiman/pozicaiman.github.io.git
+  repo: https://github.com/pozicaiman/pozicaiman.github.com.git
   branch: master
   ignore_hidden: false
   message: "Site updated: {{ now('YYYY-MM-DD HH:mm:ss') }}"
