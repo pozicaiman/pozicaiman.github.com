@@ -1,0 +1,4 @@
+# private 目录：随博客一起发布的站内配图
+# 放这里的图片会随站点构建进 docs/images/private/，
+# 在 blog 文档里用站内根相对路径加载：  /images/private/<文件>
+# 引用写法：  {% imgbed private <文件> 描述 %}

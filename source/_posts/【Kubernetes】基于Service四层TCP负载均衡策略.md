@@ -2,7 +2,7 @@
 title: Kubernetes Service 四层负载均衡策略：从 kube-proxy 调度算法到 EndpointSlice 与权重治理
 date: 2026-10-29 17:00:00
 categories: [Kubernetes]
-tags: [Kubernetes, Service, kube-proxy, IPVS, EndpointSlice, 负载均衡, 网络]
+tags: [Kubernetes, Service, kube-proxy, IPVS, EndpointSlice, 负载均衡, 网络, Prometheus, 可观测性, 过载保护]
 ---
 
 > 姊妹篇《Kubernetes 排障实战系列》讲的是 Service "通不通"——流量在数据路径上被哪一层卡住。本篇讲的是 Service "怎么分"——一个 ClusterIP 请求进来后，kube-proxy 依据什么算法从一堆后端里挑出一个，以及我们如何从 **EndpointSlice、Label、调度算法** 三个入口去改写这个选择结果。
@@ -352,7 +352,200 @@ ipvs:
 
 ---
 
-# 第 7 章：设计思想 - 三层可组合的正交模型
+# 第 7 章：进阶实践 - 基于 Prometheus 负载感知的自动摘流保护
+
+前面三章（第 4/5/6 章）给了三个手动入口：改 EndpointSlice、改 Label、改调度算法。本章把它们**串成一个自动闭环**：用容器性能负载指标（Prometheus）实时感知"哪个后端过载了"，自动给它打/摘 Label 从 Service 候选集合里摘流，过载消退后再打回去——用**连接级 LB 看不见的"真实负载"**去驱动**候选集合**的收敛，防止热点后端把整条链路拖垮。
+
+## 7.1 要解决的问题
+
+kube-proxy 的 L4 负载均衡只看 `conditions.ready` 这个**二元健康位**，不看后端**真实有多忙**。于是四类场景它会"明知有坑还往里灌"：
+
+- **数据倾斜**：某个分片 Pod 承载了热点 key，CPU/队列远高于同组其他副本；
+- **慢节点**：所在 Node  noisy neighbor、GC 停顿、缓存冷启动，处理时延飙升；
+- **连接级失真**：长连接把流量焊死在少数后端（见 11.1），ready 探针完全无感；
+- **异构规格**：同 Service 混跑不同规格 Pod，等概率轮询直接压垮小规格。
+
+**目标**：在 readiness 之外，引入一层"**该不该继续给它分流量**"的连续决策，用指标驱动 Label 自动摘流/恢复，实现过载保护。
+
+## 7.2 闭环工作原理（Mermaid）
+
+```mermaid
+flowchart LR
+    subgraph OBS["观测"]
+        POD["后端 Pod<br/>cAdvisor / 应用埋点"]
+        PROM["Prometheus<br/>抓取 + recording/alert rules"]
+    end
+    subgraph DEC["决策"]
+        CTRL["摘流控制器 Operator / CronJob<br/>双阈值迟滞 + 冷却期 + 熔断护栏"]
+    end
+    subgraph ACT["执行"]
+        PATCH["patch Pod label<br/>in-pool = true / false"]
+        ESC["EndpointSlice Controller"]
+        KP["kube-proxy 更新规则"]
+    end
+    POD -->|指标| PROM
+    PROM -->|query / 告警| CTRL
+    CTRL -->|过载摘 · 回落恢复| PATCH
+    PATCH --> ESC --> KP
+    KP -.摘流后负载回落.-> POD
+    CTRL -.护栏: 至少保留 N 个 / 最大摘除比.-> PATCH
+```
+
+摘流有两条路，**推荐第二条**：
+
+1. **粗粒度**：直接改 Service `selector` 命中的业务 label → Pod 从**所有**依赖该 selector 的 Service 脱离，副作用大。
+2. **精准**：让 Service selector 额外依赖一个"是否在池"标签 `lb.pozicaiman/in-pool: "true"`，决策器**只 flip 这一个 label**，实现"从某个 Service 摘流"而不触碰其他语义。这也是为什么走 Label 而非直接改 EndpointSlice——系统托管的 slice 手改会被覆盖（见 4.2），而 label 是稳定的期望状态入口。
+
+```yaml
+# Service 只把"在池"的 Pod 纳入后端候选集合
+spec:
+  selector:
+    app: my-svc
+    lb.pozicaiman/in-pool: "true"   # 决策器只切换这个 label
+```
+
+## 7.3 两种控制架构：集中调度引擎 vs 自动策略匹配
+
+"谁来 flip label、按什么规则 flip"有两种典型架构，实践中常**混用**（集中定边界 + 策略做动作）。两者的核心差异在于**如何处理"摘无可摘"的过载上限**。
+
+### 7.3.1 方案一：集中控制调度引擎（Centralized）
+
+单一引擎持有**全局视图**（所有 Service / 后端 Pod 的负载 + 在池比例），所有摘/恢复动作由它统一裁决。
+
+- **防抖天然强**：只有一个决策者，杜绝多控制器并发打摘导致的抖动与"抢操作"；在全局施加统一冷却窗口 + 迟滞 + 单周期动作数限速。
+- **核心护栏——最大摘除比 / 最小在池比**：设 `SHED_CAP = 40%`，即任一 Service **至少保留 60% 后端在池**。当某 Service 已有 60% 的 Pod 处于过载，引擎**不再继续摘**——**"即使过载也要不下线、忍受"**：转而走**限流 / 降级 / 排队**保护存量后端，而不是把更多节点踢出、导致剩余节点过载→级联雪崩。
+
+### 7.3.2 方案二：自动策略匹配对应措施（Policy → Action）
+
+声明式规则表：`条件(指标/比例) → 措施`，引擎按优先级匹配执行。典型**升级阶梯**：
+
+1. 单 Pod 过载 **且** 已摘除比 < 60% → **摘该 Pod**（flip `in-pool=false`，减法·止血）；
+2. 已摘除比**逼近 60% 上限** → 措施**升级为扩容**（触发 HPA / KEDA / Cluster Autoscaler 弹扩缩节点，把"减法"变"加法"·根治）；
+3. 集群**整体过载**（非摘流能解） → **限流 / 降级 + 告警**，不无脑下线。
+
+优点：措施与场景一一对应、可扩展、可审计，天然把"摘流"与"扩缩容"编排进同一条升级链。
+
+### 7.3.3 过载升级阶梯（Mermaid）
+
+```mermaid
+flowchart TD
+    DET["检测到某 Pod 过载 load_score 超过 HIGH"] --> HOT{"集群整体过载比 达 60%?"}
+    HOT -->|是| DEGRADE["限流/降级/排队<br/>宁降不摘 · 忍受 · 不下线"]
+    HOT -->|否, 只是局部热点| CAP{"该 Service 已摘除比<br/>逼近 60% 上限?"}
+    CAP -->|否, 仍有余量| SHED["摘该 Pod in-pool=false<br/>减法 · 止血"]
+    CAP -->|是, 摘无可摘| EXPAND["触发扩容 HPA/KEDA<br/>弹扩缩节点 · 加法 · 根治"]
+    SHED --> WATCH{"负载回落到 LOW 以下 且过冷却期?"}
+    EXPAND --> WATCH
+    WATCH -->|是| RECOVER["恢复 in-pool=true 打回池"]
+    WATCH -->|否| HOLD["维持现状 · 迟滞防抖"]
+```
+
+### 7.3.4 两方案对比
+
+| 维度 | 方案一 集中调度引擎 | 方案二 自动策略匹配 |
+|------|-------------------|-------------------|
+| 决策主体 | 单一全局引擎统一定夺 | 规则表 条件→措施 |
+| 防抖 | 全局冷却 + 迟滞 + 动作限速（强） | 依赖规则内迟滞，多引擎易打架 |
+| 60% 过载语义 | 硬约束：至少 60% 在池，超了宁降不摘 | 阶梯：摘到 60% → 升级为扩容 |
+| 扩容编排 | 引擎内联触发 | 作为一条措施的 action |
+| 适用 | 大规模 / 多 Service 需全局一致 | 中小规模 / 规则清晰需快速落地 |
+| 主要风险 | 引擎单点（需做 HA） | 规则冲突 / 组合爆炸 |
+
+## 7.4 核心模块
+
+| 模块 | 职责 | 典型实现 |
+|------|------|---------|
+| 指标采集 | 暴露 CPU/内存/延迟/队列/连接数 | cAdvisor、kube-state-metrics、应用埋点 |
+| 规则计算 | 复合负载分 + 过载/恢复判定 | Prometheus recording rules + alert rules |
+| 决策器 | 查指标、按迟滞/冷却/护栏决策、patch label | 小型 Operator 或 CronJob + client-go |
+| 执行 | 改写 `in-pool` label | `kubectl label --overwrite` / Patch API |
+| 护栏 | 防雪崩、防抖动、留痕 | 最小在池数、最大摘除比、冷却期、事件审计 |
+
+## 7.5 关键负载指标选择
+
+| 维度 | 指标 | 采集源 | 摘流阈值示例 |
+|------|------|--------|-------------|
+| CPU 饱和 | `rate(container_cpu_usage_seconds_total[1m]) / limit` | cAdvisor | > 0.9 持续 2m |
+| CPU 限流 | `container_cpu_cfs_throttled_periods_total` 占比 | cAdvisor | > 0.25 |
+| 内存压力 | `container_memory_working_set_bytes / limit` | cAdvisor | > 0.92 |
+| 请求延迟 | `histogram_quantile(0.99, http_request_duration_seconds_bucket)` | 应用 | P99 > 500ms |
+| 队列/连接 | backlog、active connections | 应用自定义 | 超过高水位 |
+
+单指标易被噪声误导，工程上一般合成一个 **composite load_score**（加权）再判定。
+
+## 7.6 参考实现（PromQL + 决策 + patch）
+
+```yaml
+# recording rule：把多维指标合成每 Pod 负载分（示意，阈值/权重按业务调）
+groups:
+- name: overload
+  interval: 15s
+  rules:
+  - record: pod:load_score
+    expr: |
+        0.5 * (rate(container_cpu_usage_seconds_total{container!=""}[1m]))
+      + 0.3 * (container_memory_working_set_bytes
+               / on(pod) group_left() kube_pod_container_resource_limits{resource="memory"})
+      + 0.2 * (histogram_quantile(0.99,
+               sum by (le, pod) (rate(http_request_duration_seconds_bucket[2m]))))
+  - alert: PodOverloaded
+    expr: pod:load_score > 0.85
+    for: 2m
+```
+
+```python
+# 决策器：集中引擎持全局视图，按"减法→加法→降级"阶梯决策（融合方案一护栏 + 方案二阶梯）
+HIGH, LOW   = 0.85, 0.55     # 迟滞双阈值：高于 HIGH 摘、低于 LOW 才恢复
+COOLDOWN    = 180            # 秒，任一动作后的静默期，防抖
+SHED_CAP    = 0.40           # 单 Service 最大摘除比（至少留 60% 在池）
+CLUSTER_HOT = 0.60           # 集群过载 Pod 占比阈值：超过则视为整体过热
+
+shed_ratio  = count_shed() / count_total()
+over_ratio  = count_overloaded() / count_total()
+
+if over_ratio >= CLUSTER_HOT:
+    degrade_and_throttle()                       # 全局过载：宁降不摘，限流/降级，不下线
+elif score > HIGH and in_pool and cooldown_passed():
+    if shed_ratio < SHED_CAP:
+        patch_label(pod, "lb.pozicaiman/in-pool", "false")   # 减法：摘流止血
+    else:
+        trigger_scale_out()                      # 逼近 60% 上限：升级为扩容根治
+elif score < LOW and not in_pool and cooldown_passed():
+    patch_label(pod, "lb.pozicaiman/in-pool", "true")        # 回落恢复
+```
+
+```bash
+# 手工兜底 / 演示：摘流与恢复
+kubectl label pod my-svc-7d9-abc lb.pozicaiman/in-pool=false --overwrite
+kubectl label pod my-svc-7d9-abc lb.pozicaiman/in-pool=true  --overwrite
+```
+
+## 7.7 与 HPA / readiness / Mesh 摘除的边界
+
+| 机制 | 决策依据 | 动作 | 与本章关系 |
+|------|---------|------|-----------|
+| **HPA** | 资源/自定义指标 | 增减副本（扩容） | 互补：先摘流**止血**，再扩容**根治** |
+| **readinessProbe** | 能否服务的二元健康 | 移入/移出池 | 摘流是"该不该给流量"的连续决策，比 readiness 更细 |
+| **Envoy outlier ejection** | L7 被动错误/超时 | 边车级临时剔除 | 本章是集群级、基于指标主动摘除，作用于 kube-proxy 的 EndpointSlice |
+
+## 7.8 风险、缺陷与解决方案
+
+| 风险 | 后果 | 解决方案 |
+|------|------|---------|
+| **雪崩** | 一次抖动同时摘太多，剩余后端更过载 → 级联 | `MIN_IN_POOL` + 最大摘除比例 + 全局熔断开关 |
+| **抖动 flapping** | 阈值来回穿越反复打摘 → EndpointSlice/kube-proxy 规则频繁刷新（见 11.5） | 双阈值迟滞 + 冷却期 + 时间窗口平滑 |
+| **观测滞后** | 抓取间隔 + 规则评估 → 摘流慢半拍 | 缩短 interval / push 式指标 / 配合本地限流 |
+| **长连接残留** | 摘 label 后已建连接仍打到被摘 Pod（conntrack 保持） | 摘流后主动 drain（重启连接 / 设 max connection age） |
+| **误判** | 单点指标噪声 | 复合分 + `for` 持续时长条件 |
+| **权限面** | 决策器需 patch pods 权限 | 最小 RBAC + 操作审计留痕 |
+
+## 7.9 性能参数与适用边界
+
+端到端摘流时延 ≈ 采集间隔 + 规则评估 + 决策轮询 + Controller 更新 slice + kube-proxy 同步，典型 **30s~90s**。因此本方案适合**中低频、结构性过载**（慢节点、数据倾斜、缓存冷启动）；**毫秒级突发流量**不该走这条链路，应由应用本地限流/熔断或 L7 网格的即时 outlier ejection 兜底。这条闭环的价值在于：把 kube-proxy 看不见的"真实负载"，翻译成了它能听见的"候选集合变化"。
+
+---
+
+# 第 8 章：设计思想 - 三层可组合的正交模型
 
 ```text
    ┌──────────────────────────────────────────┐
@@ -369,12 +562,13 @@ ipvs:
 1. **声明式**：只描述期望的后端集合与算法，控制环自动收敛（改 label → controller 改 slice → kube-proxy 改规则）。
 2. **正交可组合**：算法、权重、就近、亲和四件事互不耦合，可单独开关。
 3. **连接级为底，请求级上盖**：L4 是默认兜底，精确分流交给 L7，避免用 L4 硬凑语义。
+4. **三层可被指标驱动成闭环**：第 7 章把"观测→决策→改 Label→收敛候选集合"接成反馈环，让静态的三层正交模型变成**自适应的过载保护**——这是三层组合起来才能产生的涌现能力。
 
 ---
 
-# 第 8 章：应用场景与选型
+# 第 9 章：应用场景与选型
 
-## 8.1 该用哪种策略
+## 9.1 该用哪种策略
 
 | 场景 | 推荐组合 |
 |------|---------|
@@ -386,8 +580,9 @@ ipvs:
 | 跨可用区降延迟/降成本 | topology-mode `Auto` / `trafficDistribution: PreferNear` |
 | 后端频繁伸缩 + 稳定映射 | Maglev / 一致性哈希（Cilium / Mesh） |
 | 精确按 Header/百分比分流 | 上移 Ingress / Service Mesh（L7），别在 L4 硬做 |
+| 热点/慢节点结构性过载保护 | 指标驱动 Label 自动摘流闭环（第 7 章） |
 
-## 8.2 反模式
+## 9.2 反模式
 
 | 反模式 | 后果 |
 |--------|------|
@@ -400,7 +595,7 @@ ipvs:
 
 ---
 
-# 第 9 章：性能参数
+# 第 10 章：性能参数
 
 以下为常见部署下的量级参考，非 SLA。
 
@@ -419,34 +614,34 @@ ipvs:
 
 ---
 
-# 第 10 章：问题、缺陷与解决方案
+# 第 11 章：问题、缺陷与解决方案
 
-## 10.1 长连接让 L4 轮询失真
+## 11.1 长连接让 L4 轮询失真
 
 **缺陷**：连接级 LB 对 keepalive/HTTP2/gRPC 无效。
 **解决**：客户端侧 LB（gRPC round_robin + 周期重解析）或上移 L7（Mesh 的请求级 least-request）；控制单连接请求数（连接池 max requests 上限触发重连）。
 
-## 10.2 算法与权重不匹配
+## 11.2 算法与权重不匹配
 
 **缺陷**：`rr`/`sh` 忽略 weight，异构后端配了权重也不生效。
 **解决**：需要按容量分配就用 `wrr`/`wlc`，并确认 EndpointSlice 里 weight 已被 controller 正确写入。
 
-## 10.3 会话保持与弹性伸缩冲突
+## 11.3 会话保持与弹性伸缩冲突
 
 **缺陷**：`sh`/`sessionAffinity` 在后端增减时大面积重映射。
 **解决**：一致性哈希（Maglev / ring hash）降低扰动面；`sessionAffinity` 设合理 `timeoutSeconds` 而非 0（永久）。
 
-## 10.4 拓扑就近的容量倾斜
+## 11.4 拓扑就近的容量倾斜
 
 **缺陷**：`PreferNear`/`topology-mode` 在本区后端不足时可能过载热区。
 **解决**：确保回退阈值正确（Auto 会在本区健康后端 < 全域 1/2 时回退）；配合 HPA 让本区容量跟随本区流量。
 
-## 10.5 iptables 刷新风暴
+## 11.5 iptables 刷新风暴
 
 **缺陷**：大规模 Service 下 iptables 全量重算导致规则下发慢、抖动。
 **解决**：切换 IPVS 或 nftables；EndpointSlice 本身就为降低刷新粒度而生，配合使用。
 
-## 10.6 可观测盲区
+## 11.6 可观测盲区
 
 **缺陷**：kube-proxy 不做 L7，看不到请求级错误率与分布是否真的均匀。
 **解决**：结合 `kube_proxy_*` 指标 + 后端 Pod 侧连接数/请求数分布交叉验证"是否均衡"；真正的请求级观测交给 Mesh/Ingress。

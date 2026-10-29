@@ -1,0 +1,4 @@
+# public 目录：对外可外链的公网配图
+# 放这里的图片会随站点构建进 docs/images/public/，
+# 在 blog 文档里用绝对公网 URL 加载：  https://pozicaiman.github.io/images/public/<文件>
+# 引用写法：  {% imgbed public <文件> 描述 %}
