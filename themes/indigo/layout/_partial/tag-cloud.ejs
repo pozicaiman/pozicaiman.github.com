@@ -1,0 +1,72 @@
+<%
+    // 标签总览：按文章数降序排列，点击进入单标签文章列表页
+    var tagList = [];
+    var postTotal = 0;
+
+    site.tags.each(function(tag) {
+        if (tag.posts.length) {
+            tagList.push(tag);
+            postTotal += tag.posts.length;
+        }
+    });
+
+    tagList.sort(function(a, b) {
+        return b.posts.length - a.posts.length;
+    });
+
+    var maxCount = tagList.length ? tagList[0].posts.length : 1;
+%>
+<div class="tag-cloud">
+    <div class="tag-cloud-head">
+        <div class="tag-cloud-summary">
+            共 <strong><%= tagList.length %></strong> 个标签，累计 <strong><%= postTotal %></strong> 次文章标记
+        </div>
+        <div class="tag-cloud-filter">
+            <i class="icon icon-search"></i>
+            <input type="text" id="tag-filter" class="tag-cloud-input" autocomplete="off" placeholder="筛选标签…">
+        </div>
+    </div>
+    <div class="tag-cloud-list">
+    <% tagList.forEach(function(tag) {
+        var count = tag.posts.length;
+        var ratio = count / maxCount;
+        var tier = ratio >= 0.6 ? 'tier-hot' : (ratio >= 0.3 ? 'tier-warm' : 'tier-cold');
+    %>
+        <a class="tag-cloud-item <%= tier %>" href="<%- url_for(tag.path) %>" data-name="<%= tag.name %>" title="<%= tag.name %> · <%= count %> 篇文章">
+            <span class="tag-cloud-name"><%- tag.name %></span>
+            <span class="tag-cloud-count"><%= count %></span>
+        </a>
+    <% }) %>
+    </div>
+    <div class="tag-cloud-empty">没有匹配的标签</div>
+</div>
+<script>
+(function () {
+    var input = document.getElementById('tag-filter');
+    if (!input) return;
+
+    var items = Array.prototype.slice.call(document.querySelectorAll('.tag-cloud-item'));
+    var empty = document.querySelector('.tag-cloud-empty');
+
+    function filter() {
+        var kw = input.value.trim().toLowerCase();
+        var visible = 0;
+
+        items.forEach(function (el) {
+            var hit = !kw || (el.getAttribute('data-name') || '').toLowerCase().indexOf(kw) > -1;
+            el.style.display = hit ? '' : 'none';
+            if (hit) visible++;
+        });
+
+        empty.style.display = visible ? 'none' : 'block';
+    }
+
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            input.value = '';
+            filter();
+        }
+    });
+})();
+</script>

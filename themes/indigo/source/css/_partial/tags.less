@@ -103,12 +103,206 @@
     }
 }
 
+// 顶部标签栏：文章数徽标
+.tags-list-count {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 0 5px;
+    min-width: 18px;
+    line-height: 16px;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .22);
+    vertical-align: 1px;
+}
+
+.tags-list-item.active .tags-list-count {
+    background: @accentColor;
+}
+
+// 展开态（白底）下徽标反色
+.tabs-bar.expand .tags-list .tags-list-item .tags-list-count {
+    color: #fff;
+    background: @dividerColor;
+}
+
+// 标签总览（/tags/）：卡片网格 + 右上角文章数
+.tag-cloud-head {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin: 0 0 16px;
+}
+
+.tag-cloud-filter {
+    position: relative;
+    margin: 6px 0;
+
+    .icon {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        font-size: 13px;
+        color: @secondaryTextColor;
+        .transform(translateY(-50%));
+        pointer-events: none;
+    }
+}
+
+.tag-cloud-input {
+    box-sizing: border-box;
+    width: 220px;
+    height: 34px;
+    padding: 0 12px 0 32px;
+    font-size: 13px;
+    color: @primaryTextColor;
+    background: #fff;
+    border: 1px solid @borderColor;
+    border-radius: 17px;
+    outline: none;
+    .transition(.2s);
+
+    &:focus {
+        border-color: @primaryColor;
+        box-shadow: 0 0 0 2px fade(@primaryColor, 14%);
+    }
+}
+
+.tag-cloud-empty {
+    display: none;
+    padding: 48px 0;
+    text-align: center;
+    font-size: 13px;
+    color: @secondaryTextColor;
+}
+
+.tag-cloud-summary {
+    margin: 0;
+    font-size: 13px;
+    color: @secondaryTextColor;
+
+    strong {
+        padding: 0 2px;
+        font-weight: 600;
+        color: @primaryColor;
+    }
+}
+
+.tag-cloud-list {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: -6px;
+}
+
+.tag-cloud-item {
+    position: relative;
+    box-sizing: border-box;
+    display: block;
+    width: ~"calc((100% - 48px) / 4)";
+    margin: 6px;
+    padding: 14px 42px 14px 16px;
+    overflow: hidden;
+    color: @primaryTextColor;
+    border-left: 3px solid @dividerColor;
+    .card(4px);
+    .transition(.25s);
+
+    &:hover,
+    &:focus {
+        color: @primaryColor;
+        text-decoration: none;
+        border-left-color: @primaryColor;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+        .transform(translateY(-2px));
+    }
+}
+
+.tag-cloud-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tag-cloud-count {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    min-width: 20px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    line-height: 18px;
+    font-size: 12px;
+    text-align: center;
+    color: #fff;
+    border-radius: 9px;
+    background: @dividerColor;
+}
+
+.tag-cloud-item.tier-hot {
+    border-left-color: @accentColor;
+
+    .tag-cloud-count {
+        background: @accentColor;
+    }
+}
+
+.tag-cloud-item.tier-warm {
+    border-left-color: @primaryColor;
+
+    .tag-cloud-count {
+        background: @primaryColor;
+    }
+}
+
+@media screen and (max-width:1040px) {
+    .tag-cloud-item {
+        width: ~"calc((100% - 36px) / 3)";
+    }
+}
+
 @media screen and (max-width:760px) {
     .tabs-bar {
         margin-left: -16px;
         margin-right: -16px;
         padding: 0 0 0 16px;
         width: auto;
+    }
+
+    .tag-cloud-item {
+        width: ~"calc((100% - 24px) / 2)";
+        padding: 12px 38px 12px 12px;
+    }
+
+    .tag-cloud-name {
+        font-size: 13px;
+    }
+
+    .tag-cloud-input {
+        width: 100%;
+    }
+
+    .tag-cloud-filter {
+        width: 100%;
     }
 
     .tags-list {

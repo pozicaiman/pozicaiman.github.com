@@ -33,7 +33,7 @@ if(type === 'categories' || type === 'tags'){ %>
 
             %>
 
-            <a href="<%- url_for(tag.path) %>" style="-webkit-order:<%= order%>;order:<%= order%>" class="tags-list-item waves-effect waves-button waves-light<% if(is_current(tag.path)){%> active<%}%>"><%-tag.name%></a>
+            <a href="<%- url_for(tag.path) %>" style="-webkit-order:<%= order%>;order:<%= order%>" class="tags-list-item waves-effect waves-button waves-light<% if(is_current(tag.path)){%> active<%}%>"><%-tag.name%><span class="tags-list-count"><%= tag.posts.length %></span></a>
 
         <% }) %>
     </nav>
