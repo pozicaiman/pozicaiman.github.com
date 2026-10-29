@@ -36,13 +36,9 @@ tags: [LLM, Agent, RAG, LangGraph, MCP, 上下文工程, 微调, vLLM, Transform
 
 ---
 
-# 第 1 章：岗位画像——从 JD 到能力地图
+# 第 1 章：画像——从 JD 到能力地图
 
-## 1.1 岗位职责（原文保留）
-
-> 负责 AI 产品从 0 到 1 全流程落地，聚焦 AI Agent 与 RAG 系统的工程化开发，践行 “工程化驾驭大模型” 的 Harness Engineer 理念，支撑业务场景智能化升级。 主导 AI Agent 架构设计与开发：基于 LangGraph/LangChain/AgentScope/Google-ADK 实现工作流编排、工具链开发、多 Agent 协作及 Human-in-the-Loop 交互，完成复杂任务自动化与智能决策落地。 构建并优化端到端 RAG 系统：负责文档解析、分块、向量化、多路检索、重排序全流程设计，结合上下文工程（Query Rewrite、动态 Prompt、对话历史管理）提升大模型推理质量。 实现大模型工程化落地：完成多模型集成调度、流式输出、提示词工程优化，将 AI 能力与业务场景深度融合。 搭建高可用后端服务：基于 Python（FastAPI/Flask）或 Go（Gin）开发 API 与业务逻辑层，精通异步编程与微服务架构，保障系统稳定性与性能。 负责项目部署运维与架构优化：基于 Docker/K8s 完成容器化部署，搭建 CI/CD 流程，保障项目高效迭代与稳定运行。 对接业务团队，拆解需求并转化为技术方案，参与技术选型与架构优化，沉淀最佳实践并推动团队技术能力提升。
-
-按职责边界拆成七条，便于逐条对照能力：
+## 1.1 职责
 
 1. 负责 AI 产品从 0 到 1 全流程落地，聚焦 AI Agent 与 RAG 系统的工程化开发，践行 “工程化驾驭大模型” 的 Harness Engineer 理念，支撑业务场景智能化升级。
 2. 主导 AI Agent 架构设计与开发：基于 LangGraph/LangChain/AgentScope/Google-ADK 实现工作流编排、工具链开发、多 Agent 协作及 Human-in-the-Loop 交互，完成复杂任务自动化与智能决策落地。
@@ -52,11 +48,7 @@ tags: [LLM, Agent, RAG, LangGraph, MCP, 上下文工程, 微调, vLLM, Transform
 6. 负责项目部署运维与架构优化：基于 Docker/K8s 完成容器化部署，搭建 CI/CD 流程，保障项目高效迭代与稳定运行。
 7. 对接业务团队，拆解需求并转化为技术方案，参与技术选型与架构优化，沉淀最佳实践并推动团队技术能力提升。
 
-## 1.2 任职要求（原文保留）
-
-> 用 LangGraph/LangChain/AgentScope/Google-ADK，具备工作流编排、工具链开发、多 Agent 协作及对话状态管理的落地经验。 具备扎实的 RAG 与上下文工程能力：熟悉文档解析、向量数据库（Milvus/FAISS 等）、多路检索、Reranker 优化，掌握 Query Rewrite、动态 Prompt、对话历史压缩等优化手段。 熟练掌握大模型工程化技术：提示词工程、多模型调度（Azure OpenAI / 通义千问等）、流式输出，了解模型微调优先。 后端开发能力：精通 Python（FastAPI 优先），熟悉异步编程、微服务架构；了解 Spring AI/Spring Boot 者优先。 熟悉前端开发基础（Vue/React）、容器化部署（Docker/K8s）及 CI/CD 流程，能独立完成项目全流程交付。 具备良好的需求拆解与问题排查能力，关注 AI 前沿技术，能推动业务场景的技术创新与优化。
-
-按条对应：
+## 1.2 要求
 
 1. 用 LangGraph/LangChain/AgentScope/Google-ADK，具备工作流编排、工具链开发、多 Agent 协作及对话状态管理的落地经验。
 2. 具备扎实的 RAG 与上下文工程能力：熟悉文档解析、向量数据库（Milvus/FAISS 等）、多路检索、Reranker 优化，掌握 Query Rewrite、动态 Prompt、对话历史压缩等优化手段。
@@ -83,9 +75,6 @@ tags: [LLM, Agent, RAG, LangGraph, MCP, 上下文工程, 微调, vLLM, Transform
 | Docker/K8s/CI-CD | 交付工程 | 阶段五、七 | 一条流水线从提交到灰度 |
 | 前端 Vue/React 基础 | 端到端交付 | 阶段七 | 一个可演示的对话前端 |
 | Vue/React + 需求拆解 | 产品化能力 | 阶段七 | 需求到方案的拆解文档 |
-
-**一个容易被忽略的信号**：JD 里"了解模型微调优先""熟悉前端基础"这类"优先/了解"级要求，恰恰说明了岗位的真实形状——**主力是编排 + 检索 + 工程化，微调与前端是加分项而非主战场**。把 70% 精力压在阶段二、三上，是这份 JD 的最优投入策略。
-
 ---
 
 # 第 2 章：能力模型与技术栈
