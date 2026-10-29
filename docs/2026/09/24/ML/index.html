@@ -29,7 +29,7 @@
 <meta property="og:description" content="本文是《深度学习全景》的姊妹篇。DL 篇回答”如何用神经网络做端到端学习”；本篇回答”机器学习到底在做什么、经典算法如何工作、如何完成一个可靠的 ML 项目”。两者各成体系，可独立阅读。  第 1 章 机器学习全景导论1.1 什么是机器学习机器学习（Machine Learning, ML）是让计算机从数据中自动归纳规律，并用规律对新数据做预测或决策的学科。它不用人显式编写规则，而是用算法自己去">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-09-24T06:17:20.000Z">
-<meta property="article:modified_time" content="2026-09-24T06:48:27.355Z">
+<meta property="article:modified_time" content="2026-10-29T01:27:20.885Z">
 <meta property="article:author" content="CaiJianfeng">
 <meta property="article:tag" content="Scikit-learn">
 <meta property="article:tag" content="数据科学">
@@ -312,7 +312,7 @@ $$</p>
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-09-24T06:48:27.355Z" itemprop="dateUpdated">2026-09-24 14:48:27</time>
+    最后更新时间：<time datetime="2026-10-29T01:27:20.885Z" itemprop="dateUpdated">2026-10-29 09:27:20</time>
 </span><br>
 
 
@@ -355,7 +355,7 @@ $$</p>
     <div class="waves-block waves-effect prev">
       <a href="/2026/09/24/Cloud-Native/" id="post-prev" class="post-nav-link">
         <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">Cloud-Native</h4>
+        <h4 class="title">云原生体系：从容器、Kubernetes 到 Service Mesh 与 GitOps 的完整工作原理</h4>
       </a>
     </div>
   
@@ -479,6 +479,82 @@ window.MathJax = {
 };
 </script>
 <script defer src="/vendor/mathjax/tex-svg.js"></script>
+
+
+<script>
+// 把正文里的 mermaid 代码块还原成可被 mermaid 解析的 <pre class="mermaid">。
+// 背景：Hexo 的 highlight.js 会把未知语言 mermaid 当作 plaintext 输出，围栏语言标记在
+// 构建产物里被丢弃，因此不能只靠 class 判断，需再按"首行是否为 mermaid 图类型关键字"识别。
+// 兼容三种产物：<pre><code class="language-mermaid">、<figure class="highlight ...">、<pre class="mermaid">。
+(function () {
+    // mermaid 各类图的起始关键字（首行匹配即判定为 mermaid 源码）
+    var KEYWORD = /^\s*(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|gantt|pie|journey|mindmap|timeline|quadrantChart|requirementDiagram|gitGraph|packet|block-beta|C4Context|Sankey|xychart-beta|architecture)/;
+
+    function extractSource(block) {
+        // line_number 开启时 figure 内含 gutter(行号) 与 code(正文) 两个单元格，
+        // 只在 .code 单元格内取行，避免把行号拼进源码
+        var codeCell = block.querySelector ? block.querySelector('.code') : null;
+        var scope = codeCell || block;
+        var lines = scope.querySelectorAll('span.line');
+        if (lines.length) {
+            var arr = [];
+            for (var i = 0; i < lines.length; i++) arr.push(lines[i].textContent);
+            return arr.join('\n');
+        }
+        var code = scope.querySelector('code');
+        return (code || scope).textContent;
+    }
+
+    function looksLikeMermaid(node, src) {
+        var cls = ' ' + (node.className || '') + ' ';
+        if (/ (mermaid|language-mermaid) /.test(cls)) return true;   // 显式标记（若构建保留）
+        return KEYWORD.test(src);                                     // 按内容首行判定
+    }
+
+    function normalize() {
+        var nodes = document.querySelectorAll('code, figure.highlight, pre');
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node.isConnected) continue;                    // 已被替换，跳过
+            if (node.dataset && node.dataset.mermaidRaw) continue; // 已处理产物
+
+            // 定位要被整体替换的最外层块
+            var block;
+            if (node.tagName === 'CODE') block = node.parentNode;   // <pre>
+            else if (node.tagName === 'FIGURE') block = node;       // figure.highlight
+            else block = node;                                      // 已是 <pre>
+
+            var src = extractSource(block);
+            if (!looksLikeMermaid(block, src) && !looksLikeMermaid(node, src)) continue;
+
+            var holder = document.createElement('pre');
+            holder.className = 'mermaid';
+            holder.dataset.mermaidRaw = '1';
+            holder.textContent = src;
+            if (block.parentNode) block.parentNode.replaceChild(holder, block);
+        }
+    }
+
+    function ready(fn) {
+        if (document.readyState !== 'loading') fn();
+        else document.addEventListener('DOMContentLoaded', fn);
+    }
+    ready(normalize);
+    window.__mermaidNormalize = normalize;
+})();
+</script>
+<script type="module">
+    try {
+        const mermaid = (await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs')).default;
+        mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose', fontFamily: 'inherit' });
+        window.__mermaidNormalize && window.__mermaidNormalize();
+        await mermaid.run({ querySelector: '.mermaid' });
+    } catch (e) {
+        // 加载失败（离线/网络受限）时保留原始文本，GitHub 源码视图仍可原生渲染
+        console.warn('[mermaid] 渲染跳过，保留源码文本：', e);
+    }
+</script>
+
 
 
 
