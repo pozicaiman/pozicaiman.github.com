@@ -2828,7 +2828,7 @@ hr,
   min-height: calc(100vh - 340px);
 }
 .container {
-  width: 1200px;
+  width: 1500px;
   margin: 0 auto;
 }
 .container:after {
@@ -2912,7 +2912,7 @@ a[title="站长统计"] {
     padding-left: 0;
   }
 }
-@media screen and (max-width: 1240px) {
+@media screen and (max-width: 1740px) {
   .container {
     width: 100%;
     padding: 20px 16px;
