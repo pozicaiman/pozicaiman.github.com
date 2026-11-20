@@ -1,3 +1,10 @@
+---
+title: Python Web 框架
+date: 2026-11-20 10:30:00
+categories: [Python]
+tags: [Python, Python进阶, Web框架, Flask, Django, FastAPI]
+---
+
 # Python Web 框架
 
 Python Web 框架用于快速构建 Web 应用、API 服务、后台管理系统和微服务。常见框架包括 Flask、Django、FastAPI、Tornado 和 Sanic。选择框架时，需要结合项目规模、性能要求、团队经验和生态能力综合判断。

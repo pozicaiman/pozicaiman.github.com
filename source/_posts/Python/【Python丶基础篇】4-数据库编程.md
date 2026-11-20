@@ -1,3 +1,10 @@
+---
+title: Python 数据库编程
+date: 2026-11-20 10:15:00
+categories: [Python]
+tags: [Python, Python基础, 数据库, MySQL, Redis, ORM]
+---
+
 # Python 数据库编程
 
 Python 数据库编程主要用于连接数据库、执行 SQL 或命令、读写业务数据、处理事务和封装数据访问层。常见数据库可以分为关系型数据库、缓存数据库、文档数据库和嵌入式数据库。

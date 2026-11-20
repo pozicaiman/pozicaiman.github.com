@@ -1,3 +1,10 @@
+---
+title: Python 多线程并发
+date: 2026-11-20 10:25:00
+categories: [Python]
+tags: [Python, Python进阶, 多线程, 并发编程, asyncio]
+---
+
 # Python 多线程并发
 
 并发编程用于让程序在同一时间段内处理多个任务。Python 中常见并发模型包括多线程、多进程、协程和异步 I/O。选择哪种模型，取决于任务是 I/O 密集型还是 CPU 密集型。

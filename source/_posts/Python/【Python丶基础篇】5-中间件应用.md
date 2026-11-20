@@ -1,3 +1,10 @@
+---
+title: Python 中间件应用
+date: 2026-11-20 10:20:00
+categories: [Python]
+tags: [Python, Python基础, 中间件, RabbitMQ, Kafka, Redis, Elasticsearch]
+---
+
 # Python 中间件应用
 
 中间件是业务系统与基础设施之间的通用能力层，常用于配置管理、服务发现、消息通信、缓存、搜索、任务调度、安全认证、RPC 调用和日志观测。Python 项目中合理使用中间件，可以提升系统的可扩展性、稳定性和可维护性。

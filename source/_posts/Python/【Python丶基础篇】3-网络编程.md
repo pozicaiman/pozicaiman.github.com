@@ -1,3 +1,10 @@
+---
+title: Python 网络编程
+date: 2026-11-20 10:10:00
+categories: [Python]
+tags: [Python, Python基础, 网络编程, Socket, HTTP]
+---
+
 # Python 网络编程
 
 Python 网络编程主要用于编写客户端、服务端、接口调用、长连接通信和网络自动化工具。常见层次包括 TCP/IP、UDP、HTTP、WebSocket，以及基于这些协议构建的 RPC、消息推送和微服务通信。

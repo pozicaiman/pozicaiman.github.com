@@ -1,3 +1,10 @@
+---
+title: Python 基础知识
+date: 2026-11-20 10:00:00
+categories: [Python]
+tags: [Python, Python基础, 基础知识]
+---
+
 # Python 基础知识
 
 Python 是一种解释型、动态类型、面向对象的高级编程语言。它语法简洁，标准库丰富，常用于脚本自动化、Web 后端、数据分析、人工智能、运维工具和系统集成等场景。
