@@ -14,7 +14,8 @@ timezone: 'Asia/Shanghai'
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: https://pozicaiman.github.io
-permalink: :year/:month/:day/:title/
+# :name = 文件名（slug 的 basename），_posts 子目录不进入 URL，支持专题目录组织且不改变现有访问路径
+permalink: :year/:month/:day/:name/
 permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
